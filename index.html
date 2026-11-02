@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avenue — ride-hailing, end to end on your machine</title>
+<meta name="description" content="Avenue is a cross-platform ride-hailing app — iOS, Android, and web from one shared domain core, with a built-in city simulation so everything works end-to-end with no backend required.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
+<style>
+:root {
+  --bg: #14110d; --panel: #1d1812; --raised: #272117; --border: #322a1f;
+  --text: #ede5d8; --muted: #a3988a; --blue: #4c8dff; --blue-bright: #6ba1ff;
+  --green: #7fb069; --red: #d96459;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.dim { color: var(--muted); }
+
+nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px); background: rgba(20,17,13,.85); border-bottom: 1px solid var(--border); }
+nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { display: flex; gap: 10px; align-items: center; font-weight: 700; font-size: 17px; }
+.brand .logo { width: 28px; height: 28px; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+nav .links { display: flex; gap: 26px; font-size: 14.5px; color: var(--muted); }
+nav .links a:hover { color: var(--text); }
+@media (max-width: 760px) { nav .links { display: none; } }
+
+.hero { padding: 88px 0 64px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; padding-top: 56px; } }
+h1 { font-size: 44px; line-height: 1.12; letter-spacing: -.02em; margin: 18px 0 14px; }
+.tagline { font-size: 18px; color: var(--muted); margin-bottom: 14px; }
+.kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--blue); background: rgba(76,141,255,.1); border: 1px solid rgba(76,141,255,.35); padding: 6px 12px; border-radius: 999px; }
+.sub { font-size: 16px; color: var(--muted); margin-bottom: 28px; max-width: 52ch; }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-block; padding: 12px 22px; border-radius: 12px; font-weight: 600; font-size: 15px; transition: transform .15s, background .15s; }
+.btn:hover { transform: translateY(-1px); }
+.btn.primary { background: var(--blue); color: #14110d; }
+.btn.primary:hover { background: var(--blue-bright); }
+.btn.ghost { border: 1px solid var(--border); color: var(--text); }
+.btn.ghost:hover { border-color: #4a4032; }
+.ver { font-size: 13px; color: var(--muted); }
+.ver b { color: var(--blue); }
+
+/* app mock */
+.appmock { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+.appmock .tbar { display: flex; gap: 6px; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.appmock .tbar i { width: 10px; height: 10px; border-radius: 50%; background: #3a322a; }
+.appmock .tbar .up { margin-left: auto; color: var(--blue); font-size: 11px; border: 1px solid rgba(76,141,255,.4); padding: 2px 8px; border-radius: 999px; }
+.appmock .body { display: flex; min-height: 330px; }
+.appmock .side { width: 130px; border-right: 1px solid var(--border); padding: 12px 8px; font-size: 11px; }
+.appmock .side .sec { color: var(--muted); text-transform: uppercase; font-size: 9.5px; letter-spacing: .8px; padding: 8px 8px 4px; }
+.appmock .side .b { padding: 6px 8px; border-radius: 7px; display: flex; gap: 7px; align-items: center; white-space: nowrap; overflow: hidden; }
+.appmock .side .b.on { background: var(--raised); }
+.appmock .side .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.appmock .main { flex: 1; padding: 16px; }
+.appmock .title { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.appmock .ico { width: 30px; height: 30px; background: var(--raised); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+.chip { font-size: 10.5px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.chip.on { color: var(--blue); border-color: rgba(76,141,255,.4); }
+.row-line { display: flex; justify-content: space-between; font-size: 11.5px; padding: 8px 2px; border-top: 1px solid var(--border); color: var(--muted); }
+.row-line b { color: var(--text); font-weight: 500; }
+
+section { padding: 72px 0; border-top: 1px solid var(--border); }
+h2 { font-size: 30px; letter-spacing: -.01em; margin-bottom: 10px; }
+.lead { color: var(--muted); font-size: 16.5px; max-width: 62ch; margin-bottom: 36px; }
+
+/* progress map */
+.pmap { display: grid; gap: 14px; }
+.prow { display: grid; grid-template-columns: 220px 1fr 64px; gap: 16px; align-items: center; font-size: 14.5px; }
+@media (max-width: 720px) { .prow { grid-template-columns: 1fr; gap: 6px; } }
+.prow .area { display: flex; justify-content: space-between; gap: 10px; }
+.prow .area .miss { color: var(--muted); font-size: 12.5px; display: none; }
+.bar { height: 10px; background: var(--raised); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue-bright)); border-radius: 6px; }
+.bar.full i { background: var(--green); }
+.pct { font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: var(--blue); text-align: right; }
+.prow.total { padding-top: 8px; border-top: 1px solid var(--border); font-weight: 700; }
+.prow.total .pct { color: var(--blue-bright); }
+.src { font-size: 12.5px; color: var(--muted); margin-top: 18px; }
+
+/* features */
+.grid { display: grid; gap: 16px; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) { .g3 { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 26px; transition: border-color .15s; }
+.card:hover { border-color: #4a4032; }
+.card .ico { font-size: 26px; margin-bottom: 14px; }
+.card h3 { font-size: 17.5px; margin-bottom: 8px; }
+.card p { font-size: 14.5px; color: var(--muted); }
+.uniq { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 8px 26px; margin-top: 32px; }
+.uniq li { list-style: none; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; display: flex; gap: 12px; }
+.uniq li:last-child { border-bottom: none; }
+.uniq .n { color: var(--blue); font-family: ui-monospace, Menlo, monospace; font-size: 13px; padding-top: 2px; }
+
+/* whats new */
+.news { display: grid; gap: 10px; }
+.news .item { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 110px 1fr; gap: 16px; font-size: 14.5px; }
+@media (max-width: 640px) { .news .item { grid-template-columns: 1fr; gap: 4px; } }
+.news .v { color: var(--blue); font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+
+/* download */
+#download .inst { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin: 26px 0; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+#download code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: var(--blue); }
+.copy { background: var(--raised); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+.copy:hover { border-color: #4a4032; }
+.copy.done { border-color: var(--blue); color: var(--blue); }
+.note { font-size: 13.5px; color: var(--muted); margin-top: 14px; }
+
+footer { border-top: 1px solid var(--border); padding: 34px 0 44px; color: var(--muted); font-size: 13.5px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+
+/* ride mock (avenue additions) */
+.ridemap { position: relative; height: 148px; background: var(--raised); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden;
+  background-image: linear-gradient(rgba(50,42,31,.55) 1px, transparent 1px), linear-gradient(90deg, rgba(50,42,31,.55) 1px, transparent 1px); background-size: 26px 26px; }
+.ridemap .rseg { position: absolute; background: var(--blue); }
+.ridemap .r1 { left: 14%; top: calc(78% - 1.5px); width: 26%; height: 3px; border-radius: 3px 0 0 3px; }
+.ridemap .r2 { left: calc(40% - 1.5px); top: 48%; width: 3px; height: 30%; }
+.ridemap .r3 { left: 40%; top: calc(48% - 1.5px); width: 24%; height: 3px; }
+.ridemap .r4 { left: calc(64% - 1.5px); top: 20%; width: 3px; height: 28%; }
+.ridemap .r5 { left: 64%; top: calc(20% - 1.5px); width: 22%; height: 3px; border-radius: 0 3px 3px 0; }
+.ridemap .mk { position: absolute; transform: translate(-50%, -50%); font-size: 11px; line-height: 1; }
+.ridemap .mk.pu { left: 14%; top: 78%; width: 11px; height: 11px; border-radius: 50%; background: var(--green); border: 2px solid var(--panel); }
+.ridemap .mk.do { left: 86%; top: 20%; width: 11px; height: 11px; border-radius: 50%; background: var(--text); border: 2px solid var(--panel); }
+.ridemap .mk.car { left: 52%; top: 48%; font-size: 15px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+.ridemap .mk.amb { color: var(--muted); opacity: .55; font-size: 9.5px; }
+.ridemap .surge { position: absolute; top: 9px; right: 9px; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 999px; color: var(--red); background: rgba(217,100,89,.12); border: 1px solid rgba(217,100,89,.45); }
+.dcard { display: flex; align-items: center; gap: 12px; background: var(--raised); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-top: 12px; }
+.dcard .av { width: 32px; height: 32px; border-radius: 50%; background: var(--panel); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.dcard .who { font-size: 12.5px; line-height: 1.45; }
+.dcard .who .dim { font-size: 11px; }
+.dcard .eta { margin-left: auto; text-align: right; }
+.dcard .eta b { color: var(--blue); font-size: 14.5px; }
+.dcard .eta .dim { font-size: 10px; display: block; }
+
+/* terminal (avenue additions) */
+.term { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-top: 28px; box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+.term .tbar { display: flex; gap: 6px; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.term .tbar i { width: 10px; height: 10px; border-radius: 50%; background: #3a322a; }
+.term pre { padding: 16px 20px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.8; overflow-x: auto; color: var(--text); }
+.term .p { color: var(--blue); font-weight: 700; }
+.term .c { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#"><span class="logo">🚗</span> Avenue</a>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#architecture">How it fits</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/KSWORK2001/avenue-releases" target="_blank" rel="noopener">Releases</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div>
+    <span class="kicker">Cross-platform · iOS, Android, web</span>
+    <h1>Hail a ride.&#8203;On your own machine.</h1>
+    <p class="tagline">A cross-platform ride-hailing app — one shared domain core, two frontends, and a built-in city simulation. No backend required.</p>
+    <p class="sub">Five ride products, multi-stop trips, surge, promos, scheduled rides, rider and driver modes — every feature runs locally against the simulation engine, which ticks at 8× real time so demos complete fast while ETAs still read like minutes.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="#download">Get Avenue</a>
+      <a class="btn ghost" href="#features">How it works</a>
+      <span class="ver">latest: <b id="ver">…</b></span>
+    </div>
+  </div>
+
+  <div class="appmock" aria-hidden="true">
+    <div class="tbar"><i></i><i></i><i></i>&nbsp;&nbsp;Avenue<span class="up">driver arriving</span></div>
+    <div class="body">
+      <div class="side">
+        <div class="sec">Mode</div>
+        <div class="b on"><span class="dot"></span>Rider</div>
+        <div class="b"><span class="dot"></span>Driver</div>
+        <div class="sec">Saved places</div>
+        <div class="b">🏠 Home · Mission</div>
+        <div class="b">💼 Work · SoMa</div>
+        <div class="b">✈️ SFO · Terminal 2</div>
+      </div>
+      <div class="main">
+        <div class="title"><span class="ico">🚗</span> Avenue X · to Ferry Building</div>
+        <div class="chips">
+          <span class="chip on">X · $12.40</span><span class="chip">XL</span>
+          <span class="chip">Comfort</span><span class="chip">Black</span>
+          <span class="chip">Green</span>
+        </div>
+        <div class="ridemap">
+          <i class="rseg r1"></i><i class="rseg r2"></i><i class="rseg r3"></i><i class="rseg r4"></i><i class="rseg r5"></i>
+          <span class="mk amb" style="left:26%;top:30%;">🚗</span>
+          <span class="mk amb" style="left:74%;top:64%;">🚗</span>
+          <span class="mk amb" style="left:33%;top:14%;">🚗</span>
+          <span class="mk car">🚙</span>
+          <span class="mk pu"></span>
+          <span class="mk do"></span>
+          <span class="surge">1.4× surge</span>
+        </div>
+        <div class="row-line"><span>Pickup</span><b>518 Valencia St, Mission</b></div>
+        <div class="row-line"><span>Dropoff</span><b>Ferry Building, Embarcadero</b></div>
+        <div class="dcard">
+          <span class="av">🧔</span>
+          <span class="who"><b>Marc · 4.9★</b><br><span class="dim">Silver Prius · 6ZK 4218</span></span>
+          <span class="eta"><b>4 min</b><span class="dim">away</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Everything end-to-end, no backend.</h2>
+    <p class="lead">No servers, no API keys, no stubbed buttons — a city simulation inside the shared core moves drivers, matches rides, and completes trips while both frontends run the real domain logic.</p>
+    <div class="grid g3">
+      <div class="card"><div class="ico">🏙️</div><h3>A city that drives itself</h3><p>A simulation engine in <span class="mono">packages/shared</span> runs ambient cars across a synthesized San Francisco — ride matching, movement along routes, dispatch offers, scheduled-ride activation — ticking at 8× real time so demos finish fast.</p></div>
+      <div class="card"><div class="ico">💸</div><h3>Real fares, real surge</h3><p>Five ride products (X, XL, Comfort, Black, Green/EV) with per-product fares and ETAs, deterministic surge per location and 10-minute demand bucket, promo codes, and receipts that break down fare, surge, and tip.</p></div>
+      <div class="card"><div class="ico">🔁</div><h3>Rider and driver, both seats</h3><p>Request, track, chat, and rate from the rider seat — then flip to driver mode: go online, accept offers on a 12-second countdown, run the trip to arrival, and watch the 78%-share earnings ledger grow.</p></div>
+      <div class="card"><div class="ico">🧩</div><h3>One codebase, three platforms</h3><p>Types, fares and surge, places, the engine, stores, and the server API contract all live in <span class="mono">packages/shared</span>. iOS, Android, and web consume identical engine events — so they behave the same.</p></div>
+      <div class="card"><div class="ico">📱</div><h3>Expo mobile, Next.js web</h3><p><span class="mono">apps/web</span> is Next.js 15 (App Router, React 19, react-leaflet + OpenStreetMap — no API key). <span class="mono">apps/mobile</span> is Expo SDK 54 with react-native-maps for iOS and Android.</p></div>
+      <div class="card"><div class="ico">✅</div><h3>Typechecked, end to end</h3><p>One npm workspace: <span class="mono">npm run typecheck</span> covers shared + web + mobile, a node:test suite runs the domain and engine lifecycle (13 tests), and <span class="mono">npm run web:build</span> ships a production web build.</p></div>
+    </div>
+    <ul class="uniq">
+      <li><span class="n">01</span>Multi-stop trips — add up to two stops; the car pauses at each, and fares and ETAs cover the full route</li>
+      <li><span class="n">02</span>Real device GPS on every platform — pickup defaults to your actual location, with a simulated San Francisco fallback</li>
+      <li><span class="n">03</span>Scheduled rides that auto-start, plus trip history with full receipts, ratings, and tipping</li>
+      <li><span class="n">04</span>A safety toolkit — one-tap 911, live trip sharing with trusted contacts, and a public /trip/:id share page</li>
+      <li><span class="n">05</span>Payments end-to-end: cards, cash, and Avenue Wallet — plus in-trip chat with quick replies</li>
+    </ul>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <h2>How it fits together.</h2>
+    <p class="lead">One TypeScript workspace. The shared domain core powers both frontends, and everything runs locally against <span class="mono">createMockApi()</span> — swap in a real <span class="mono">ServerApi</span> client and nothing in the UI changes.</p>
+    <div class="grid g3">
+      <div class="card"><div class="ico">🧠</div><h3 class="mono">packages/shared</h3><p>The domain core — types, fares and surge, places, the city simulation engine, Zustand stores, and the server API contract both apps run against.</p></div>
+      <div class="card"><div class="ico">🌐</div><h3 class="mono">apps/web</h3><p>Next.js 15 web app (App Router, React 19) with rider and driver mode, live maps via react-leaflet + OpenStreetMap, and shareable /trip/:id pages.</p></div>
+      <div class="card"><div class="ico">📱</div><h3 class="mono">apps/mobile</h3><p>Expo (React Native) app for iOS and Android — expo-router, react-native-maps, AsyncStorage, real GPS with a simulated SF fallback.</p></div>
+    </div>
+    <div class="term">
+      <div class="tbar"><i></i><i></i><i></i>&nbsp;&nbsp;avenue — npm workspaces</div>
+      <pre><span class="p">$</span> npm install
+<span class="p">$</span> npm run web        <span class="c"># Next.js 15 → http://localhost:3000</span>
+<span class="p">$</span> npm run mobile     <span class="c"># Expo — scan the QR code with Expo Go, or press i / a for simulators</span>
+<span class="p">$</span> npm run typecheck  <span class="c"># shared + web + mobile</span></pre>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <h2>Get Avenue.</h2>
+    <p class="lead">Avenue is in a private beta — version 0.1.0 — covering iOS, Android, and the web. Builds land on the releases feed as they ship.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/KSWORK2001/avenue-releases/releases/latest" target="_blank" rel="noopener">Latest release</a>
+    </div>
+    <p class="note">The source is private during the beta. Every build lives on the releases page — the badge on this page tracks <b id="ver2">the latest</b> automatically.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>🚗 Avenue — a cross-platform ride-hailing app with a built-in city simulation.</span>
+    <span><a href="https://github.com/KSWORK2001/avenue-releases" target="_blank" rel="noopener">Releases</a> · <a href="#">Website</a> · one shared domain core · two frontends · zero backend</span>
+  </div>
+</footer>
+
+<script>
+async function ver() {
+  try {
+    const r = await fetch("https://api.github.com/repos/KSWORK2001/avenue-releases/releases/latest");
+    const j = await r.json();
+    const v = (j.tag_name || "").replace(/^v/, "");
+    if (v) {
+      document.getElementById("ver").textContent = v;
+      document.getElementById("ver2").textContent = v;
+    }
+  } catch (e) { document.getElementById("ver").textContent = "see releases"; }
+}
+ver();
+</script>
+</body>
+</html>
